@@ -1,11 +1,11 @@
 # Data-Science
-# Explainable ML for Job-Skill Matching, Sentiment & Rank Prediction
+# Explainable ML for Job-Skill Matching, Sentiment & Click Prediction
 
 A multi-domain investigation into how well SHAP (and LIME) explanations reveal the inner workings of tree-based models, using three real-world datasets:
 
 1. **Job–Skill Matching** (Glassdoor salary listings)  
 2. **Sentiment Analysis** (text-based sentiment labels)  
-3. **Rank Prediction** (numeric scores or ratings)
+3. **Click Prediction** (numeric scores or ratings)
 
 We train Random Forest and XGBoost classifiers/regressors on each task, explain their predictions with SHAP and LIME, and evaluate those explanations along five rigorous axes.
 
@@ -32,7 +32,7 @@ We train Random Forest and XGBoost classifiers/regressors on each task, explain 
 ## Research Questions
 
 **Main RQ**  
-> How effectively can SHAP and LIME explain complex tree-based models across different domains (job–skill matching, sentiment analysis, rank prediction)?
+> How effectively can SHAP and LIME explain complex tree-based models across different domains (job–skill matching, sentiment analysis, click prediction)?
 
 **Sub-RQ 1: Global Explanation Quality**  
 > Which features do SHAP’s global importance scores identify as most predictive, and how faithfully do those global rankings reflect actual model behavior?  
@@ -46,13 +46,13 @@ We train Random Forest and XGBoost classifiers/regressors on each task, explain 
 > - **Agreement:** Spearman’s ρ between SHAP vectors and LIME weights  
 
 **Sub-RQ 3: Monotonicity of Key Features**  
-> Do SHAP attributions vary monotonically with crucial continuous inputs (e.g. average salary, sentiment score, rank)?  
+> Do SHAP attributions vary monotonically with crucial continuous inputs (e.g. average salary, sentiment score, click probability)?  
 > - **Metric:** Spearman’s ρ between feature-quantile bins and mean SHAP in each bin  
 
 **Sub-RQ 4: Cross-Model & Cross-Domain Comparison**  
 > How do explanation-quality metrics compare:  
 > 1. Random Forest vs. XGBoost  
-> 2. Job–Skill vs. Sentiment vs. Rank datasets  
+> 2. Job–Skill vs. Sentiment vs. click datasets  
 
 ---
 
@@ -66,7 +66,7 @@ We train Random Forest and XGBoost classifiers/regressors on each task, explain 
    - Source: _(to be specified)_  
    - Features: text embeddings or n-gram counts, sentiment labels (positive/negative).  
 
-3. **Rank Prediction**  
+3. **Click Prediction**  
    - Source: _(to be specified)_  
    - Features: job-rank or rating metadata, candidate/viewer demographics.
 
@@ -87,7 +87,7 @@ A cleaned CSV for the job dataset (`salary_data_cleaned_final.csv`) is included 
 
 ### Model Training
 
-For each skill flag (and analogously for sentiment/rank):
+For each skill flag (and analogously for sentiment/click probability):
 
 1. **Split** 80/20 train/test (stratified on a dummy target)  
 2. **Fit**  
