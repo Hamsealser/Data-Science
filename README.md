@@ -140,9 +140,12 @@ In the Skill task, AUPRC@3 exceeded 0.84 for Python and Excel, again confirming 
 
 However, in the Job Description dataset, AUPRC for the top feature (salary) was only 0.64, with lower MEMC — suggesting only partial faithfulness. ⚠️
 
-Conclusion: SHAP’s global importance scores were generally predictive and informative, especially in structured tasks like click prediction and skill impact.
-Yet, their faithfulness varied across datasets and models — strong in XGBoost and FairJob, but weaker in Random Forest and text-heavy tasks.
-Overall rating: ✅✅⚠️
+Conclusion: 
+
+SHAP’s global importance scores were generally predictive and informative, especially in structured tasks like click prediction and skill impact.  
+Yet, their faithfulness varied across datasets and models — strong in **XGBoost** and **FairJob**, but weaker in **Random Forest** and **text-heavy tasks**.  
+**Overall rating:** ✅✅⚠️
+
 ---
 
 ## Sub-RQ2: Local Explanation Consistency and Agreement
@@ -167,11 +170,12 @@ Stability under small input perturbations was highly model-dependent:
 
 RF models were far more stable, with sensitivity values close to zero — e.g., 0.0015 in FairJob — indicating robust local explanations. ✅
 
-XGBoost models, however, were highly sensitive, especially in the Skill task (e.g., 57.5 for Spark, 49.6 for Python), meaning small changes to input led to large changes in explanation. ❌
-Conclusion:
-Local SHAP explanations were stable and faithful in Random Forest models, but sensitive and inconsistent in XGBoost.
-SHAP–LIME agreement was consistently poor, undermining trust in explanations across methods.
-Overall rating: ✅⚠️❌
+XGBoost models, however, were highly sensitive, especially in the Skill task (e.g., 57.5 for Spark, 49.6 for Python), meaning small changes to input led to large changes in explanation. ❌  
+**Conclusion:**  
+Local SHAP explanations were stable and faithful in **Random Forest** models, but sensitive and inconsistent in **XGBoost**.  
+**SHAP–LIME agreement** was consistently poor, undermining trust in explanations across methods.  
+**Overall rating:** ✅⚠️❌
+
 ---
 
 ## Sub-RQ3: Monotonicity of Key Features
@@ -184,6 +188,7 @@ In the FairJob dataset, monotonicity was moderate (e.g., ~0.49 for XGBoost, ~0.4
 In the Job Description → Experience task, monotonicity scores were very low (~0.15–0.20), suggesting little to no consistent pattern between input changes and SHAP attributions. ❌
 
 Conclusion
+
 SHAP attributions were strongly monotonic in well-structured, numeric tasks like skill-based salary prediction, but less consistent in more abstract or text-based settings.
 Overall rating: ✅⚠️❌
 
