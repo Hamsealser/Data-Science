@@ -130,7 +130,7 @@ SHAP’s global feature rankings were most faithful in the FairJob dataset, wher
 
 In the Skill → Salary task, high MEMC values for features like Python (0.247) and AWS (0.286) in XGBoost showed strong model reliance on these features. However, RF models showed lower MEMC, indicating more diffuse reliance. ⚠️
 
-In the Job Description → Experience task, MEMC scores were relatively low for both models (0.18 and ~0.25), suggesting weaker alignment between SHAP scores and actual model behavior. ⚠️❌
+In the Job Description → Experience task, MEMC scores were relatively low for both models (0.180 for RF, 0.022 for Light BERT), suggesting weak alignment between SHAP scores and actual model behavior. ❌
 
 ### AUPRC (Top-k Feature Selection)  
 Across datasets, AUPRC confirmed that SHAP’s top features preserved predictive power:
@@ -139,18 +139,18 @@ In FairJob, AUPRC@3 reached 0.803 (XGBoost) and 0.752 (RF), reflecting high glob
 
 In the Skill task, AUPRC@3 exceeded 0.84 for Python and Excel, again confirming that top SHAP features carried strong signals. ✅
 
-However, in the Job Description dataset, AUPRC for the top feature (salary) was only 0.64, with lower MEMC — suggesting only partial faithfulness. ⚠️
+However, in the Job Description dataset, AUPRC for the top feature (salary) was only 0.684 (RF) and 0.752 (Light BERT), with low MEMC — suggesting only partial faithfulness. ⚠️
 
-Conclusion: 
-
+**Conclusion:**  
 SHAP’s global importance scores were generally predictive and informative, especially in structured tasks like click prediction and skill impact.  
-Yet, their faithfulness varied across datasets and models — strong in **XGBoost** and **FairJob**, but weaker in **Random Forest** and **text-heavy tasks**.  
-**Overall rating:** ✅✅⚠️
+Yet, their faithfulness varied across datasets and models — strong in **XGBoost** and **FairJob**, but weaker in **Random Forest**, **Light BERT**, and **text-heavy or low-dimensional tasks**.  
+**Overall rating:** ✅⚠️❌
 
 ---
 
 ## Sub-RQ2: Local Explanation Consistency and Agreement
 How stable and consistent are local explanations under perturbations, and how well do SHAP and LIME agree on individual predictions?
+
 ### SHAP vs. LIME (Spearman Correlation)  
 Local agreement between SHAP and LIME was consistently weak or negative across all datasets:
 
@@ -165,17 +165,24 @@ SHAP explanations were generally faithful to the model’s output, especially in
 
 Across all datasets, RF models had lower infidelity scores than XGBoost (e.g., 0.0025 vs. 0.0056 in FairJob), showing that SHAP matched model behavior more closely. ✅
 
-In Skill → Salary, XGBoost infidelity rose significantly (e.g., 0.103 for Python), suggesting unstable explanations despite high feature importance. ⚠️❌
+In Skill → Salary, XGBoost infidelity rose significantly (e.g., 0.103 for Python), suggesting unstable explanations despite high feature importance. ❌
+
+In the Job Description dataset, Light BERT had near-zero infidelity (0.0000), far better than RF (0.0067), suggesting more accurate explanations. ✅
+
 ### Sensitivity  
 Stability under small input perturbations was highly model-dependent:
 
 RF models were far more stable, with sensitivity values close to zero — e.g., 0.0015 in FairJob — indicating robust local explanations. ✅
 
-XGBoost models, however, were highly sensitive, especially in the Skill task (e.g., 57.5 for Spark, 49.6 for Python), meaning small changes to input led to large changes in explanation. ❌  
+XGBoost models, however, were highly sensitive, especially in the Skill task (e.g., 57.5 for Spark, 49.6 for Python), meaning small changes to input led to large changes in explanation. ❌
+
+Light BERT was exceptionally stable in the Job Description task (sensitivity: 0.0003), in contrast to RF (4.13), suggesting superior local robustness. ✅
+
 **Conclusion:**  
-Local SHAP explanations were stable and faithful in **Random Forest** models, but sensitive and inconsistent in **XGBoost**.  
+Local SHAP explanations were stable and faithful in **Random Forest** and **Light BERT** models, but sensitive and inconsistent in **XGBoost**.  
 **SHAP–LIME agreement** was consistently poor, undermining trust in explanations across methods.  
-**Overall rating:** ✅⚠️❌
+**Overall rating:** ✅✅❌
+
 
 ---
 
@@ -195,38 +202,40 @@ Overall rating: ✅⚠️❌
 
 ---
 
-## Sub-RQ4: Cross-Model and Cross-Domain Comparison
-| Dataset                     | Target       | Model    | SHAP MEMC | AUPRC@3 | Infidelity | Sensitivity | Monotonicity | SHAP–LIME Agreement |
-|-----------------------------|--------------|----------|-----------|---------|-------------|--------------|---------------|----------------------|
-| Salary Data (Job Description) | Avg Salary   | RF       | ⚠️ 0.18   | ⚠️ 0.64 | ✅ 0.0067   | ⚠️ 0.78     | ❌ 0.15        | ❌ Low / unstable     |
-|                             |              | XGBoost  | ✅ ~0.25   | ✅ 0.71 | ❌ 0.0090   | ❌ 0.82     | ❌ 0.20        | ❌ Low                |
-| FairJob                     | Click        | RF       | ⚠️ 0.114  | ✅ 0.752| ✅ 0.0025   | ✅ 0.0015   | ⚠️ 0.455       | ❌ -0.722             |
-|                             |              | XGBoost  | ✅ 0.137   | ✅ 0.803| ⚠️ 0.0056   | ❌ 0.0108   | ⚠️ 0.492       | ❌ -0.445             |
-| Salary Data (Skill → Salary)| Python       | RF       | ⚠️ 0.151  | ✅ 0.846| ✅ 0.0006   | —           | ✅ 0.95        | ⚠️ 0.18               |
-|                             |              | XGBoost  | ✅ 0.247   | ✅ 0.887| ❌ 0.103    | ❌ 49.64    | ⚠️ 0.39        | ⚠️ 0.18               |
-|                             | Spark        | RF       | ❌ 0.017   | ✅ 0.781| ✅ 0.0005   | —           | ✅ 0.81        | ⚠️ 0.22               |
-|                             |              | XGBoost  | ⚠️ 0.068   | ⚠️ 0.618| ❌ 0.076    | ❌ 57.51    | ❌ -0.09       | ⚠️ 0.22               |
-|                             | AWS          | RF       | ⚠️ 0.046   | ✅ 0.798| ✅ 0.0008   | —           | ✅ 0.82        | ⚠️ 0.16               |
-|                             |              | XGBoost  | ✅ 0.286   | ⚠️ 0.700| ❌ 0.062    | ❌ 42.46    | ✅ 0.92        | ⚠️ 0.16               |
-|                             | Excel        | RF       | ⚠️ 0.089   | ✅ 0.799| ✅ 0.0008   | —           | ❌ -0.78       | ⚠️ 0.19               |
-|                             |              | XGBoost  | ⚠️ 0.162   | ✅ 0.759| ❌ 0.122    | ❌ 57.53    | ❌ -0.59       | ⚠️ 0.19               |
+## Sub-RQ4 – Cross-Model and Cross-Domain Comparison
+
+| Dataset                      | Target       | Model       | SHAP MEMC | AUPRC@3 | Infidelity | Sensitivity | Monotonicity | SHAP–LIME Agreement       |
+|------------------------------|--------------|-------------|-----------|---------|-------------|--------------|---------------|----------------------------|
+| Salary Data (Job Description) | Avg Salary   | RF          | ✅ 0.180  | ✅ 0.684 | ✅ 0.0067   | ❌ 4.1306   | ❌ 0.067       | ❌ Low / unstable          |
+|                              |              | Light BERT  | ⚠️ 0.022  | ✅ 0.752 | ✅ 0.0000   | ✅ 0.0003   | ✅ -0.612      | ⚠️ 0.18                    |
+| FairJob                      | Click        | RF          | ⚠️ 0.114  | ✅ 0.752 | ✅ 0.0025   | ✅ 0.0015   | ⚠️ 0.455       | ❌ -0.722                  |
+|                              |              | XGBoost     | ✅ 0.137  | ✅ 0.803 | ⚠️ 0.0056   | ❌ 0.0108   | ⚠️ 0.492       | ❌ -0.445                  |
+| Salary Data (Skill → Salary) | Python       | RF          | ⚠️ 0.151  | ✅ 0.846 | ✅ 0.0006   | —           | ✅ 0.95        | ⚠️ 0.18                    |
+|                              |              | XGBoost     | ✅ 0.247  | ✅ 0.887 | ❌ 0.103    | ❌ 49.64    | ⚠️ 0.39        | ⚠️ 0.18                    |
+|                              | Spark        | RF          | ❌ 0.017  | ✅ 0.781 | ✅ 0.0005   | —           | ✅ 0.81        | ⚠️ 0.22                    |
+|                              |              | XGBoost     | ⚠️ 0.068  | ⚠️ 0.618 | ❌ 0.076    | ❌ 57.51    | ❌ -0.09       | ⚠️ 0.22                    |
+|                              | AWS          | RF          | ⚠️ 0.046  | ✅ 0.798 | ✅ 0.0008   | —           | ✅ 0.82        | ⚠️ 0.16                    |
+|                              |              | XGBoost     | ✅ 0.286  | ⚠️ 0.700 | ❌ 0.062    | ❌ 42.46    | ✅ 0.92        | ⚠️ 0.16                    |
+|                              | Excel        | RF          | ⚠️ 0.089  | ✅ 0.799 | ✅ 0.0008   | —           | ❌ -0.78       | ⚠️ 0.19                    |
+|                              |              | XGBoost     | ⚠️ 0.162  | ✅ 0.759 | ❌ 0.122    | ❌ 57.53    | ❌ -0.59       | ⚠️ 0.19                    |
 
 
 These comparisons show that SHAP provides more detailed and accurate explanations than LIME, especially in XGBoost models, where top-ranked features aligned well with model behavior. However, this came at the cost of greater sensitivity and reduced local stability. Random Forest models offered more robust and consistent explanations but tended to distribute importance more evenly, leading to lower global faithfulness.
 ---
 
-## Final Summary
-SHAP emerged as a more effective and reliable explainability technique than LIME across nearly all evaluation criteria.
-It produced high-fidelity global feature rankings and locally faithful attributions, even in complex, high-dimensional tasks. SHAP’s alignment with model behavior was particularly strong in XGBoost, which also achieved the highest predictive performance and most concentrated feature reliance.
+##  Final Summary (Updated)
 
-However, SHAP explanations were also more sensitive in XGBoost, reflecting its sharper decision boundaries and susceptibility to input perturbations.
-By contrast, Random Forest offered more robust and stable explanations, albeit with less feature concentration.
+SHAP emerged as a more effective and reliable explainability technique than LIME across nearly all evaluation criteria.  
+It consistently produced high-fidelity global feature rankings and locally faithful attributions, even in complex, high-dimensional tasks. SHAP’s alignment with model behavior was particularly strong in **tree-based models** like Random Forest and XGBoost, with the latter (when used) showing the highest predictive performance and most concentrated reliance on top features.
 
-LIME, on the other hand, consistently showed weak to negative agreement with SHAP and less reliable local explanations — especially in low-dimensional or text-based contexts.
+However, SHAP explanations in XGBoost (and occasionally in Random Forest) were also more **sensitive to input perturbations**, reflecting sharper decision boundaries and less local stability. By contrast, **Light BERT**, although weaker in overall prediction accuracy, produced **more stable and monotonic SHAP explanations** in low-dimensional settings — likely due to its smoother functional form and fewer decision thresholds.
 
-In conclusion, SHAP is the preferred tool for explaining tree-based models across diverse domains. It enables trustworthy explanations that support both global interpretation and instance-level reasoning — making it a strong choice for practical applications like job recommendations, skill-based salary modeling, and click prediction. ✅
+LIME, on the other hand, consistently showed **weak to negative agreement** with SHAP and offered **less reliable local explanations**, especially when working with models trained on very few features or flat input patterns. This limitation was most apparent in the *Salary Data (Job Description)* task, where LIME often returned [0, 0] importance scores.
 
-In short, if you’re trusting a model to make decisions, SHAP is what you want explaining those decisions.
----
+In conclusion, **SHAP remains the preferred tool** for explaining model predictions across diverse domains and architectures.  
+It enables trustworthy interpretations that support both global insight and instance-level reasoning — making it a strong choice for practical applications like job recommendations, skill-based salary modeling, and click prediction. ✅
+
+> In short: if you're trusting a model to make decisions, **SHAP is what you want explaining those decisions** — particularly when interpretability, consistency, and insight matter.
+
 
 
