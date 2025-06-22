@@ -5,9 +5,10 @@
 When we heard the question “Does your therapist need a therapist?” – we immediately thought: well, maybe SHAP does.  
 In this project, we ask if explainable AI methods like **SHAP** and **LIME** truly explain tree-based models, or just throw around plausible-sounding scores.  
 To find out, we ran both methods across three datasets —  
+- **Click Prediction** (predicting ad engagement)  
 - **Job–Skill Matching** (from Glassdoor listings)  
 - **Sentiment Analysis** (based on job description text)  
-- **Click Prediction** (predicting ad engagement)  
+
 
 and two models: 
 - **Random Forest** 
